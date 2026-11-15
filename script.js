@@ -22,8 +22,8 @@ buttons.forEach(button =>
             let result = [...convertedParts];
                 console.log(result);
 
-            let index = result.findIndex(part => part === "*"|| part === "/");
-                console.log(index);
+            /*let index = result.findIndex(part => part === "*"|| part === "/");
+                 console.log(index);
 
             let left = result[index -1];
             let right = result[index +1];
@@ -40,9 +40,29 @@ buttons.forEach(button =>
             console.log(calculation);
 
             result.splice(index - 1, 3, calculation );
-                console.log(result);
+                console.log(result);*/
+            let left;
+            let right;
+            let operator;
 
-            let nextIndex = result.findIndex(part => part === "+" || part === "-");
+            while (result.some(part => part === "*" || part === "/")) {
+                let index = result.findIndex(part => part === "*" || part === "/");
+               
+                left = result[index - 1];
+                right = result[index +1 ];
+
+                operator = result[index];
+                let calculation;
+                if (operator === "*") {
+                    calculation = left * right;
+                }
+                else if (operator === "/") {
+                    calculation = left / right;
+                }
+                result.splice(index - 1, 3, calculation);
+            }
+
+            /*let nextIndex = result.findIndex(part => part === "+" || part === "-");
                 console.log(nextIndex);
 
             left = result[nextIndex -1];
@@ -51,7 +71,37 @@ buttons.forEach(button =>
 
             console.log(left, operator, right);
 
+            let finalCalculation;
+            if (operator === "+") {
+                finalCalculation = left + right;
             }
+            else if (operator === "-"){
+                finalCalculation = left - right;
+            }
+            console.log(finalCalculation);
+
+            display.value = finalCalculation;
+
+            }*/
+
+            while (result.some(part => part === "+" || part === "-")) {
+                let nextIndex = result.findIndex(part => part === "+" || part === "-");
+
+                left = result[nextIndex - 1];
+                right = result[nextIndex + 1];
+                operator = result[nextIndex];
+
+                let finalCalculation;
+                if (operator === "+") {
+                    finalCalculation = left + right;
+                }
+                else if (operator === "-") {
+                    finalCalculation = left - right;
+                }
+                result.splice(nextIndex -1, 3, finalCalculation);
+            }
+            display.value = result[0];
+        }
            catch {
             display.value = "Error"
            }
