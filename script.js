@@ -12,41 +12,38 @@ buttons.forEach(button =>
     }
     else if (button.textContent === "=") {
            try{
-            const parts = display.value.match(/\d+\.?\d*|[+\-\*/%]/g);
+            if ( display.value.trim() === ""){
+                return;
+            }
+
+            const parts = display.value.match(/-?\d+\.?\d*|[+*/%\-]/g);
             console.log(parts);
 
             const convertedParts = parts.map(part => isNaN(part) ? part :
             Number(part));
                 console.log(convertedParts);
+            
+            const isValid = convertedParts.every((part, index) =>{
+                if (index % 2 === 0) {
+                    return typeof part === "number";
+                }
+                else { 
+                    return ["+", "-", "*", "/", "%"].includes(part);
+                }
+            });
+                if (!isValid || convertedParts.length % 2 === 0){
+                    throw new Error("Invalid Expression");
+                }
 
             let result = [...convertedParts];
                 console.log(result);
 
-            /*let index = result.findIndex(part => part === "*"|| part === "/");
-                 console.log(index);
-
-            let left = result[index -1];
-            let right = result[index +1];
-                console.log(left,right);
-
-            let operator = result[index];
-            let calculation;
-            if(operator === "*") {
-                calculation = left * right;
-            }
-            else if (operator === "/") {
-                calculation = left / right;
-            }
-            console.log(calculation);
-
-            result.splice(index - 1, 3, calculation );
-                console.log(result);*/
             let left;
             let right;
             let operator;
 
-            while (result.some(part => part === "*" || part === "/")) {
-                let index = result.findIndex(part => part === "*" || part === "/");
+            while (result.some(part => part === "*" || part === "/" || part === "%")) {
+                let index = result.findIndex(part => part === "*" || part === "/" || part === "%");
                
                 left = result[index - 1];
                 right = result[index +1 ];
@@ -57,32 +54,17 @@ buttons.forEach(button =>
                     calculation = left * right;
                 }
                 else if (operator === "/") {
+                    if (right === 0 ) {
+                        throw new Error("Cannot divided by zero");
+                    }
                     calculation = left / right;
+                }
+                else if (operator === "%") {
+                    calculation = left % right;
                 }
                 result.splice(index - 1, 3, calculation);
             }
 
-            /*let nextIndex = result.findIndex(part => part === "+" || part === "-");
-                console.log(nextIndex);
-
-            left = result[nextIndex -1];
-            right = result[nextIndex +1];
-            operator = result[nextIndex];
-
-            console.log(left, operator, right);
-
-            let finalCalculation;
-            if (operator === "+") {
-                finalCalculation = left + right;
-            }
-            else if (operator === "-"){
-                finalCalculation = left - right;
-            }
-            console.log(finalCalculation);
-
-            display.value = finalCalculation;
-
-            }*/
 
             while (result.some(part => part === "+" || part === "-")) {
                 let nextIndex = result.findIndex(part => part === "+" || part === "-");
@@ -107,8 +89,51 @@ buttons.forEach(button =>
            }
     }
     else {
+        if (["+", "-", "*", "/", "%"].includes(button.textContent)) {
+            const lastCharacter = display.value.slice(-1);
+            
+            if (["+", "-", "*", "/", "%"].includes(lastCharacter)) {
+                display.value =
+                display.value.slice(0, -1) +button.textContent;
+                return
+            }
+            if (display.value === "") {
+                return;
+            }
+        }
+        if (button.textContent === ".") {
+            const currentNumber = display.value.split(/[+\-\*\/%]/).pop();
+            if (currentNumber.includes(".")){
+                return;
+            }
+            if (currentNumber === "") {
+                display.value += "0"; 
+            }
+        }
             display.value += button.textContent;
         }
     });
+});
+
+document.addEventListener("keydown", (event) =>{
+    let key = event.key;
+    
+    if (key === "Enter") {
+        key = "=";
+    }
+    else if (key === "Backspace") {
+        key = "DEL";
+    }
+    else if (key === "Escape") {
+        key ="C";
+    }
+
+    const matchingButton = [...buttons].find(button =>
+        button.textContent === key
+    );
+    if (matchingButton) {
+        event.preventDefault();
+        matchingButton.click();
+    }
 });
 
