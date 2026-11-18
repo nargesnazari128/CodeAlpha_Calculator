@@ -16,12 +16,12 @@ buttons.forEach(button =>
                 return;
             }
 
-            const parts = display.value.match(/-?\d+\.?\d*|[+*/%\-]/g);
-            console.log(parts);
+            const parts = display.value.match(/(?:^|(?<=[+*/%\-]))-?\d+\.?\d*|[+*/%\-]/g);
+            
 
             const convertedParts = parts.map(part => isNaN(part) ? part :
             Number(part));
-                console.log(convertedParts);
+            
             
             const isValid = convertedParts.every((part, index) =>{
                 if (index % 2 === 0) {
@@ -93,11 +93,18 @@ buttons.forEach(button =>
             const lastCharacter = display.value.slice(-1);
             
             if (["+", "-", "*", "/", "%"].includes(lastCharacter)) {
+                if (button.textContent === "-" && ["%", "*", "/"].includes(lastCharacter)) {
+                    display.value += "-";
+                    return;
+                }
                 display.value =
                 display.value.slice(0, -1) +button.textContent;
-                return
+                return;
             }
             if (display.value === "") {
+                if (button.textContent === "-") {
+                    display.value = "-";
+                }
                 return;
             }
         }
